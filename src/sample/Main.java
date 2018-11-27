@@ -16,8 +16,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("My Gorgeous Dataframe Manager");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setTitle("My Gorgeous DataFrame Manager");
+        primaryStage.setScene(new Scene(root, 850, 650));
         primaryStage.show();
     }
 
@@ -27,8 +27,7 @@ public class Main extends Application {
             launch(args);
             Controller controller = new Controller();
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + " ?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-            alert.showAndWait();
+            System.out.println("42");
         }
 
 
