@@ -1,9 +1,11 @@
 package sample;
 
-import com.company.DataFrame;
+import com.company.*;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 
 class DataFrameDB extends DataFrame {
 
@@ -13,22 +15,54 @@ class DataFrameDB extends DataFrame {
     }
 
 
-    DataFrame create(String req) throws Exception {
+    static DataFrame create(String types[], String req) throws Exception {
+        DataFrame res = new DataFrame(types, types);
         SQLRunner sqlRunner = new SQLRunner();
         sqlRunner.connect();
         sqlRunner.request = sqlRunner.conn.createStatement();
-        sqlRunner.result = sqlRunner.request.executeQuery("SELECT isbn, title, author, year FROM books");
-        ResultSetMetaData resultMetaData = sqlRunner.result.getMetaData();
-        int columnsNumber = resultMetaData.getColumnCount();
+        sqlRunner.result = sqlRunner.request.executeQuery(req);
         while (sqlRunner.result.next()) {
-            for (int i = 1; i <= columnsNumber; i++) {
+            ArrayList<Value> row = new ArrayList<>();
+            for (int i = 1; i <= types.length; i++) {
                 String out = sqlRunner.result.getString(i);
-                System.out.print(out + ",");
+                Value tmp;
+                switch (types[i - 1]) {
+                    case "NewInteger":
+                        tmp = new NewInteger.Builder().val(Integer.parseInt(out)).build();
+                        break;
+                    case "NewDouble":
+                        tmp = new NewDouble.Builder().val(Double.parseDouble(out)).build();
+                        break;
+                    case "NewDateTime":
+                        tmp = new NewDateTime.Builder().val(out).build();
+                        break;
+                    case "NewString":
+                        tmp = new NewString.Builder().val(out).build();
+                        break;
+                    default:
+                        tmp = new NewString.Builder().val(out).build();
+                        break;
+                }
+                row.add(tmp);
             }
-            System.out.println();
+            res.add(row);
         }
-        return null;
+        return res;
     }
 
+    static DataFrame max(String types[], String req, int col) throws Exception {
+        String request = req + " ORDER BY " + col + " DESC LIMIT 1;";
+        return DataFrameDB.create(types, request);
+    }
+
+    static DataFrame min(String types[], String req, int col) throws Exception {
+        String request = req + " ORDER BY " + col + " ASC LIMIT 1;";
+        return DataFrameDB.create(types, request);
+    }
+
+    static DataFrame group(String types[], String req, int col) throws Exception {
+        String request = req + " GROUP BY " + col + ";";
+        return DataFrameDB.create(types, request);
+    }
 
 }

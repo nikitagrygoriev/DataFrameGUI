@@ -1,5 +1,7 @@
 package sample;
 
+import com.company.DataFrame;
+
 import java.io.File;
 import java.sql.*;
 
@@ -9,10 +11,17 @@ public class SQLRunner {
     ResultSet result = null;
 
     public static void main(String[] args) {
-        SQLRunner sqlRunner = new SQLRunner();
-        DataFrameDB t = new DataFrameDB(new File("aa"), new String[]{"aa"}, true);
+//        SQLRunner sqlRunner = new SQLRunner();
         try {
-            t.create("SELECT isbn, title, author, year FROM books");
+            DataFrame test;
+            test = DataFrameDB.create(new String[]{"NewString", "NewString", "NewString", "NewInteger"}, "SELECT isbn, title, author, year FROM books");
+//            test.dfprint();
+            test = DataFrameDB.max(new String[]{"NewString", "NewString", "NewString", "NewInteger"}, "SELECT isbn, title, author, year FROM books", 4);
+            test.dfprint();
+            test = DataFrameDB.min(new String[]{"NewString", "NewString", "NewString", "NewInteger"}, "SELECT isbn, title, author, year FROM books", 4);
+            test.dfprint();
+            test = DataFrameDB.group(new String[]{"NewString", "NewString", "NewString", "NewInteger"}, "SELECT isbn, title, author, year FROM books", 4);
+            test.dfprint();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -21,11 +30,8 @@ public class SQLRunner {
     void connect() {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            conn =
-                    DriverManager.getConnection("jdbc:mysql://mysql.agh.edu.pl/grygorie",
-                            "grygorie", "H6uqco1CFVaynk14");
-
-
+            conn = DriverManager.getConnection("jdbc:mysql://mysql.agh.edu.pl/grygorie",
+                    "grygorie", "H6uqco1CFVaynk14");
         } catch (SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
@@ -55,12 +61,11 @@ public class SQLRunner {
             // handle any errors
 
         } finally {
-            // zwalniamy zasoby, które nie będą potrzebne
             if (result != null) {
                 try {
                     result.close();
                 } catch (SQLException sqlEx) {
-                } // ignore
+                }
                 result = null;
             }
 
@@ -68,8 +73,7 @@ public class SQLRunner {
                 try {
                     request.close();
                 } catch (SQLException sqlEx) {
-                } // ignore
-
+                }
                 request = null;
             }
         }
